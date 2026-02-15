@@ -1,0 +1,31 @@
+- name: Ensure font directory exists
+  file:
+    path: /usr/share/fonts/opentype/Meslo
+    state: directory
+    mode: "0755"
+
+- name: Install fontconfig
+  apt:
+    name: fontconfig
+    state: present
+  become: yes
+
+- name: Download Meslo Nerd Font
+  get_url:
+    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Meslo.zip"
+    dest: /tmp/Meslo.zip
+    mode: "0644"
+
+- name: Extract Meslo fonts
+  unarchive:
+    src: /tmp/Meslo.zip
+    dest: /usr/share/fonts/opentype/Meslo
+    remote_src: yes
+
+- name: Remove temporary zip file
+  file:
+    path: /tmp/Meslo.zip
+    state: absent
+
+- name: Rebuild font cache
+  command: fc-cache -f

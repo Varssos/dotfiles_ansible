@@ -1,0 +1,22 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install common packages
+  apt:
+    name:
+      - git
+      - wget
+      - unzip
+      - stow
+    state: present
+
+- name: Clone dotfiles repository
+  git:
+    repo: '{{ dotfiles_repo }}'
+    dest: "{{ dotfiles_path }}"
+
+# TODO
+# - name: Copy from host machine dotfiles to target machine instead of git push and git clone for tests

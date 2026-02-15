@@ -1,0 +1,67 @@
+---
+- name: Remove existing kitty stow
+  command:
+    cmd: stow -D kitty
+    chdir: "{{ dotfiles_path }}"
+  become_user: "{{ ansible_user }}"
+
+- name: Install kitty terminal
+  apt:
+    name: kitty
+    state: present
+
+
+- name: Get kitty version
+  command: kitty --version
+  register: kitty_version_raw
+  changed_when: false
+  failed_when: false
+
+- name: Extract kitty version number
+  set_fact:
+    kitty_version: "{{ kitty_version_raw.stdout.split()[1] }}"
+  when: kitty_version_raw.rc == 0
+
+
+- name: Apply Catppuccin Mocha theme
+  shell: 'kitty +kitten themes --reload-in=all Catppuccin-Mocha'
+  become_user: "{{ ansible_user }}"
+  when:
+    - kitty_version is defined
+    - kitty_version is version('0.26.0', '>=')
+# ~/.config/kitty/ should exist
+
+
+# When applying catppuccin theme is not working
+- name: Create ~/.config/kitty directory
+  file:
+    path: "{{ user_home_path }}/.config/kitty"
+    state: directory
+    mode: "0755"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Make sure ~/.config/kitty/kitty.conf exists
+  file:
+    path: "{{ user_home_path }}/.config/kitty/kitty.conf"
+    state: touch
+    mode: "0644"
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+
+- name: Apply kitty stow
+  command:
+    cmd: stow kitty
+    chdir: "{{ dotfiles_path }}"
+  become_user: "{{ ansible_user }}"
+# ~/.config/kitty/kitty-private.conf should exist as symlink
+
+
+- name: Ensure kitty-private.conf is included in kitty.conf
+  lineinfile:
+    path: "{{ user_home_path }}/.config/kitty/kitty.conf"
+    regexp: '^\s*#?\s*include\s+kitty-private\.conf'
+    line: 'include kitty-private.conf'
+    state: present
+  become_user: "{{ ansible_user }}"
