@@ -10,7 +10,7 @@ Public dotfiles are stored in `dotfiles` repo.
 sudo apt update && sudo apt install ansible-core -y
 ```
 
-2. Set username in `./hosts`
+2. Set ansible_user in `./hosts`
 ```
 ansible_user=sw
 ```
