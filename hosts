@@ -2,7 +2,7 @@
 localhost ansible_connection=local ansible_user=sw
 
 [docker]
-ubuntu2204 ansible_host=localhost ansible_user=ubuntu_user ansible_connection=ssh ansible_ssh_port=2204
-ubuntu2404 ansible_host=localhost ansible_user=ubuntu_user ansible_connection=ssh ansible_ssh_port=2404
-ubuntu2510 ansible_host=localhost ansible_user=ubuntu_user ansible_connection=ssh ansible_ssh_port=2510
-# ubuntu2604 ansible_host=localhost ansible_user=ubuntu_user ansible_connection=ssh ansible_ssh_port=2604
+ubuntu2204 ansible_host=localhost ansible_user=ubuntu_user ansible_connection=ssh ansible_ssh_port=2204 ansible_ssh_common_args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+ubuntu2404 ansible_host=localhost ansible_user=ubuntu_user ansible_connection=ssh ansible_ssh_port=2404 ansible_ssh_common_args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+ubuntu2510 ansible_host=localhost ansible_user=ubuntu_user ansible_connection=ssh ansible_ssh_port=2510 ansible_ssh_common_args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+# ubuntu2604 ansible_host=localhost ansible_user=ubuntu_user ansible_connection=ssh ansible_ssh_port=2604 ansible_ssh_common_args='-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
