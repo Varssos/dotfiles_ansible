@@ -2,7 +2,5 @@
 - hosts: docker
   become: yes
 
-  # tasks:
-  #   - include_tasks: tasks/main.yml
   roles:
     - dotfiles
