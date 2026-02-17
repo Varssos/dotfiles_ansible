@@ -22,7 +22,7 @@ ansible-playbook run.yml -K
 
 
 ## Tests
-Run ansible on VM run by vagrant. Check `vagrant_for_ansible/README.md`
+Run ansible on vagrant VMs. Check `vagrant_for_ansible/README.md`
 ```
 cd vagrant_for_ansible
 ./run.sh
