@@ -22,8 +22,8 @@ ansible-playbook run.yml -K
 
 
 ## Tests
-Run ansible for test docker images
+Run ansible on VM run by vagrant. Check `vagrant_for_ansible/README.md`
 ```
-cd test_docker
+cd vagrant_for_ansible
 ./run.sh
 ```
