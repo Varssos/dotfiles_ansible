@@ -3,6 +3,14 @@
 This project automate dotifles on ubuntu based systems with ansible.
 Public dotfiles are stored in `dotfiles` repo.
 
+## Add submodules
+
+```
+git submodule init
+git submodule update --init --remote --recursive
+```
+
+
 ## Usage
 
 1. Install ansible
