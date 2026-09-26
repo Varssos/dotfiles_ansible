@@ -5,17 +5,9 @@
       - xclip
     state: present
 
-- name: Remove existing tmux stow
-  command:
-    cmd: stow -D tmux
-    chdir: "{{ dotfiles_path }}"
-  become_user: "{{ ansible_user }}"
-
-
-
 - name: Check if Meslo fonts already exist
   find:
-    paths: /usr/share/fonts/opentype/Meslo
+    paths: "{{ tmux_meslo_fonts_dir }}"
     patterns: "*.ttf"
     recurse: no
   register: meslo_fonts
@@ -45,11 +37,13 @@
     state: directory
   become_user: "{{ ansible_user }}"
 
-- name: Apply tmux stow
+- name: Apply tmux stow (restow to pick up any changes)
   command:
-    cmd: stow tmux
+    cmd: stow -R tmux
     chdir: "{{ dotfiles_path }}"
   become_user: "{{ ansible_user }}"
+  register: tmux_stow
+  changed_when: tmux_stow.stdout != '' or tmux_stow.stderr != ''
 
 # Don't know why sometimes it returns error code 1 even if everything is fine
 - name: Source tmux plugins

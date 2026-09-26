@@ -1,10 +1,4 @@
 ---
-- name: Remove existing kitty stow
-  command:
-    cmd: stow -D kitty
-    chdir: "{{ dotfiles_path }}"
-  become_user: "{{ ansible_user }}"
-
 - name: Install kitty terminal
   apt:
     name: kitty
@@ -50,11 +44,13 @@
     group: "{{ ansible_user }}"
 
 
-- name: Apply kitty stow
+- name: Apply kitty stow (restow to pick up any changes)
   command:
-    cmd: stow kitty
+    cmd: stow -R kitty
     chdir: "{{ dotfiles_path }}"
   become_user: "{{ ansible_user }}"
+  register: kitty_stow
+  changed_when: kitty_stow.stdout != '' or kitty_stow.stderr != ''
 # ~/.config/kitty/kitty-private.conf should exist as symlink
 
 

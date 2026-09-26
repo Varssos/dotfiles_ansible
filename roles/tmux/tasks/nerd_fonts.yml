@@ -1,6 +1,6 @@
 - name: Ensure font directory exists
   file:
-    path: /usr/share/fonts/opentype/Meslo
+    path: "{{ tmux_meslo_fonts_dir }}"
     state: directory
     mode: "0755"
 
@@ -19,7 +19,7 @@
 - name: Extract Meslo fonts
   unarchive:
     src: /tmp/Meslo.zip
-    dest: /usr/share/fonts/opentype/Meslo
+    dest: "{{ tmux_meslo_fonts_dir }}"
     remote_src: yes
 
 - name: Remove temporary zip file
@@ -29,3 +29,4 @@
 
 - name: Rebuild font cache
   command: fc-cache -f
+  changed_when: true

@@ -1,15 +1,11 @@
 ---
-- name: Remove existing bashrc stow
+- name: Apply bashrc stow (restow to pick up any changes)
   command:
-    cmd: stow -D bashrc
+    cmd: stow -R bashrc
     chdir: "{{ dotfiles_path }}"
   become_user: "{{ ansible_user }}"
-
-- name: Apply bashrc stow
-  command:
-    cmd: stow bashrc
-    chdir: "{{ dotfiles_path }}"
-  become_user: "{{ ansible_user }}"
+  register: bashrc_stow
+  changed_when: bashrc_stow.stdout != '' or bashrc_stow.stderr != ''
 
 - name: Check if source line exists in ~/.bashrc
   lineinfile:
