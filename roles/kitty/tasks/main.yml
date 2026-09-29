@@ -61,3 +61,80 @@
     line: 'include kitty-private.conf'
     state: present
   become_user: "{{ ansible_user }}"
+
+
+- name: Get target user UID for GNOME session
+  command: id -u
+  become_user: "{{ ansible_user }}"
+  register: kitty_user_uid
+  changed_when: false
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Check target user GNOME session bus
+  stat:
+    path: "/run/user/{{ kitty_user_uid.stdout }}/bus"
+  register: kitty_user_session_bus
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Configure Kitty GNOME keyboard shortcut
+  block:
+    - name: Read existing GNOME custom shortcuts
+      command:
+        argv:
+          - gsettings
+          - get
+          - org.gnome.settings-daemon.plugins.media-keys
+          - custom-keybindings
+      register: kitty_custom_keybindings
+      changed_when: false
+      environment:
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ kitty_user_uid.stdout }}/bus"
+        XDG_RUNTIME_DIR: "/run/user/{{ kitty_user_uid.stdout }}"
+
+    - name: Add Kitty to GNOME custom shortcuts
+      command:
+        argv:
+          - gsettings
+          - set
+          - org.gnome.settings-daemon.plugins.media-keys
+          - custom-keybindings
+          - "{{ ((kitty_custom_keybindings.stdout | regex_replace('^@as\\s+', '') | from_yaml) + ['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/kitty/']) | to_json }}"
+      when: "'/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/kitty/' not in (kitty_custom_keybindings.stdout | regex_replace('^@as\\s+', '') | from_yaml)"
+      environment:
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ kitty_user_uid.stdout }}/bus"
+        XDG_RUNTIME_DIR: "/run/user/{{ kitty_user_uid.stdout }}"
+
+    - name: Read Kitty GNOME shortcut settings
+      command:
+        argv:
+          - gsettings
+          - get
+          - "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/kitty/"
+          - "{{ item.key }}"
+      loop:
+        - { key: name, value: 'Kitty Terminal' }
+        - { key: command, value: kitty }
+        - { key: binding, value: '<Control><Alt>t' }
+      register: kitty_shortcut_settings
+      changed_when: false
+      environment:
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ kitty_user_uid.stdout }}/bus"
+        XDG_RUNTIME_DIR: "/run/user/{{ kitty_user_uid.stdout }}"
+
+    - name: Set Kitty GNOME shortcut settings
+      command:
+        argv:
+          - gsettings
+          - set
+          - "org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/kitty/"
+          - "{{ item.item.key }}"
+          - "{{ item.item.value }}"
+      loop: "{{ kitty_shortcut_settings.results }}"
+      when: (item.stdout | trim | from_yaml) != item.item.value
+      environment:
+        DBUS_SESSION_BUS_ADDRESS: "unix:path=/run/user/{{ kitty_user_uid.stdout }}/bus"
+        XDG_RUNTIME_DIR: "/run/user/{{ kitty_user_uid.stdout }}"
+  become_user: "{{ ansible_user }}"
+  when:
+    - ansible_distribution == 'Ubuntu'
+    - kitty_user_session_bus.stat.exists
