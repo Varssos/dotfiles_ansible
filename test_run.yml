@@ -1,6 +1,0 @@
----
-- hosts: docker
-  become: yes
-
-  roles:
-    - dotfiles

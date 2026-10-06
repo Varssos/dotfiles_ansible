@@ -1,2 +1,0 @@
-user_home_path: /home/{{ ansible_user }}
-dotfiles_path: /home/{{ ansible_user }}/dotfiles

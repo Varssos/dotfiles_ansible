@@ -1,0 +1,4 @@
+---
+user_home_path: /home/{{ ansible_user }}
+dotfiles_path: "{{ user_home_path }}/dotfiles"
+dotfiles_repo: https://github.com/Varssos/dotfiles.git

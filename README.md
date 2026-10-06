@@ -1,37 +1,28 @@
 # dotfiles_ansible
 
-This project automate dotifles on ubuntu based systems with ansible.
-Public dotfiles are stored in `dotfiles` repo.
+Ansible role that installs `git` and `stow` and clones the [dotfiles](https://github.com/Varssos/dotfiles) repository to `~/dotfiles` on Debian/Ubuntu systems.
 
-## Add submodules
+Stowing of individual packages is done by the roles that depend on this one (`bashrc`, `kitty`, `tmux`).
 
-```
-git submodule init
-git submodule update --init --remote --recursive
-```
+## Requirements
 
+- Debian or Ubuntu host
+- `become: true` privileges (sudo)
+- `ansible_user` must be set
 
-## Usage
+## Role Variables
 
-1. Install ansible
-```
-sudo apt update && sudo apt install ansible-core -y
-```
+| Variable | Default | Description |
+|---|---|---|
+| `user_home_path` | `/home/{{ ansible_user }}` | Home directory of the target user |
+| `dotfiles_path` | `{{ user_home_path }}/dotfiles` | Where the dotfiles repo is cloned |
+| `dotfiles_repo` | `https://github.com/Varssos/dotfiles.git` | Dotfiles repository URL |
 
-2. Set ansible_user in `./hosts`
-```
-ansible_user=sw
-```
+## Example Playbook
 
-3. Run ansible playbook on localhost
-```
-ansible-playbook run.yml -K
-```
-
-
-## Tests
-Run ansible on vagrant VMs. Check `vagrant_for_ansible/README.md`
-```
-cd vagrant_for_ansible
-./run.sh
+```yaml
+- hosts: all
+  become: true
+  roles:
+    - role: dotfiles
 ```

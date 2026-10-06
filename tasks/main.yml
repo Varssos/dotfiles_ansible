@@ -1,0 +1,15 @@
+---
+- name: Install git and stow
+  apt:
+    name:
+      - git
+      - stow
+    state: present
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Clone dotfiles repository
+  git:
+    repo: "{{ dotfiles_repo }}"
+    dest: "{{ dotfiles_path }}"
+  become_user: "{{ ansible_user }}"
